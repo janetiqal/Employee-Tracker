@@ -35,7 +35,7 @@ VALUES ("Elton", "John", 1, NULL),
 ("Dua", "Lipa", 10, NULL),
 ("Frank", "Ocean",11, NULL);
 
---MANAGERS NOT WORKING OUT THEY WAY I NEED IT TOO
+--MANAGERS NOT WORKING OUT THEY WAY I NEED IT TO
 
 --Choosing Managers based on employee id rather then hard coding, in case the employee gets fired/removed from DATABASE
 -- -- -- want every dept to have a manager
