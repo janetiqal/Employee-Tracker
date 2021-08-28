@@ -22,28 +22,29 @@ VALUES ("Sales Lead", 90000, 1),
 ("IT Lead", 80000, 5),
 ("IT Specialist", 75000, 5);
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Elton", "John", 1, NULL),
-("Celine", "Dion", 2, NULL),
-("Kanye", "West", 3, NULL),
-("Alabama", "Shakes",4, NULL),
-("Taylor", "Swift", 5, NULL),
-("Leon", "Bridges", 6, NULL),
-("Noah","Cyrus", 7, NULL),
-("Carole", "King", 8, NULL),
-("Nina", "Simone",9, NULL),
-("Dua", "Lipa", 10, NULL),
-("Frank", "Ocean",11, NULL);
-
---MANAGERS NOT WORKING OUT THEY WAY I NEED IT TO
+INSERT INTO employee (first_name, last_name, role_id)
+VALUES ("Elton", "John", 1),
+("Celine", "Dion", 2),
+("Kanye", "West", 3),
+("Alabama", "Shakes",4),
+("Taylor", "Swift", 5),
+("Leon", "Bridges", 6),
+("Noah","Cyrus", 7),
+("Carole", "King", 8),
+("Nina", "Simone",9),
+("Dua", "Lipa", 10),
+("Frank", "Ocean",11);
 
 --Choosing Managers based on employee id rather then hard coding, in case the employee gets fired/removed from DATABASE
--- -- -- want every dept to have a manager
--- UPDATE employee SET manager_id = 1 WHERE id = 1; ELTON manages dion
--- UPDATE employee SET manager_id = 2 WHERE id = 3; WEST manages shakes, swift
--- UPDATE employee SET manager_id = 3 WHERE id = 7; CYRUS manages bridges
--- UPDATE employee SET manager_id = 4 WHERE id = 8; KING manages simone
--- UPDATE employee SET manager_id = 5 WHERE id = 8; LIPA manages ocean
+-- want every dept to have a manager
+UPDATE employee SET manager_id = 1 WHERE id = 2; 
+
+UPDATE employee SET manager_id = 2 WHERE id = 4; 
+UPDATE employee SET manager_id = 2 WHERE id = 5; 
+UPDATE employee SET manager_id = 3 WHERE id = 6; 
+UPDATE employee SET manager_id = 3 WHERE id = 9; 
+UPDATE employee SET manager_id = 4 WHERE id = 11; 
+
 
 
 
