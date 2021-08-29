@@ -29,9 +29,6 @@ function init() {
                 case "Update Employees Role":
                     updateEmployeeRole();
                     break;
-                case "View All Roles":
-                    viewAllRoles();
-                    break;
                 case "Add Role":
                     addRole();
                     break;
@@ -41,31 +38,34 @@ function init() {
             }
         })
 };
-//Table View of Employees: Includes id, first& last name, title, department, salary,manager
+//Table View of Employees: Includes id, first & last name, title, department, salary, and manager.
 function viewEmployeeTable() {
     //need id, first& last name, title, department, salary,manager
-    var query = 'SELECT * FROM employee'
-    //query needs work
-    // 'SELECT employee.id ,employee.first_name, employee.last_name, role.title, name AS department, role.salary FROM employee LEFT JOIN role ON employee.role_id = role.department_id'
+    //three tables: role and employee and department tables
+    var query =  "SELECT employee.id,employee.first_name AS 'First Name', employee.last_name AS 'Last Name', role.title AS Title, role.salary AS Salary, name AS Department, CONCAT(manager.first_name, ' ', manager.last_name)AS Manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON department.id = role.department_id LEFT JOIN employee manager ON manager.id = employee.manager_id ORDER BY department.name"
     dbConnect.query(query, function (err, results) {
-        console.log(results)
+        if(err){
+            console.log('Error with Employee Table', err)
+        }
         console.table(results);
-
+        init();
     })
 };
 
 //Table View of Departments: Includes job title, role id, department the role belongs to, and corresponding salary
 function viewEmployeeRoles() {
-    var query = ''
+    var query = 'SELECT role.id ,role.title AS Title , role.salary AS Salary, department.name AS Department FROM role LEFT JOIN department ON role.department_id = department.id'
     dbConnect.query(query, function (err, results) {
         console.table(results);
+        init();
     })
 };
 //Table View of Departments: Includes id and name of departments
 function viewAllDepartments() {
-    var query = 'SELECT * FROM department';
+    var query = 'SELECT department.id ,department.name AS Department FROM department';
     dbConnect.query(query, function (err, results) {
         console.table(results);
+        init();
     })
 };
 
@@ -82,12 +82,21 @@ function addEmployee() {
             message:"What is the employee's last name?",
             name: "lastName"
         },
-        //finsih these questions 
+        {
+            type: "list",
+            message:"What is the employee's role",
+            name: "role",
+            choices:[]
+        },
+        {
+            type: "list",
+            message:"What is the employee's manager?",
+            name: "role",
+            choices:[]
+        }
     ])
 }
 
-//id, title, department and salary
-function viewAllRoles() { }
 //add role
 function addRole() {
     inquirer.prompt([
@@ -122,5 +131,22 @@ function addDepartment() {
             // add response.newDepartment to database
         })
 
+}
+
+function updateEmployeeRole (){
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "Which employees role do you want to update?",
+            name: "roleUpdate",
+            choices: []
+        },
+        {
+            type: "list",
+            message: "Which role do you want to assign to this selected employee?",
+            name: "newSalary"
+        }
+        //updated employees role
+    ])
 }
 init();

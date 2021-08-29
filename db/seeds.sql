@@ -39,11 +39,11 @@ VALUES ("Elton", "John", 1),
 -- want every dept to have a manager
 UPDATE employee SET manager_id = 1 WHERE id = 2; 
 
-UPDATE employee SET manager_id = 2 WHERE id = 4; 
-UPDATE employee SET manager_id = 2 WHERE id = 5; 
-UPDATE employee SET manager_id = 3 WHERE id = 6; 
-UPDATE employee SET manager_id = 3 WHERE id = 9; 
-UPDATE employee SET manager_id = 4 WHERE id = 11; 
+UPDATE employee SET manager_id = 3 WHERE id = 4; 
+UPDATE employee SET manager_id = 3 WHERE id = 5; 
+UPDATE employee SET manager_id = 7 WHERE id = 6; 
+UPDATE employee SET manager_id = 8 WHERE id = 9; 
+UPDATE employee SET manager_id = 10 WHERE id = 11; 
 
 
 
