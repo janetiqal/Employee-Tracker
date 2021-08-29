@@ -56,6 +56,9 @@ function viewEmployeeTable() {
 function viewEmployeeRoles() {
     var query = 'SELECT role.id ,role.title AS Title , role.salary AS Salary, department.name AS Department FROM role LEFT JOIN department ON role.department_id = department.id'
     dbConnect.query(query, function (err, results) {
+        if(err){
+            console.log("Error with viewing Employee Roles", err)
+        }
         console.table(results);
         init();
     })
@@ -64,6 +67,9 @@ function viewEmployeeRoles() {
 function viewAllDepartments() {
     var query = 'SELECT department.id ,department.name AS Department FROM department';
     dbConnect.query(query, function (err, results) {
+        if(err){
+            console.log("Error with viewing Departments", err)
+        }
         console.table(results);
         init();
     })
@@ -84,17 +90,33 @@ function addEmployee() {
         },
         {
             type: "list",
-            message:"What is the employee's role",
+            message:"What is the employee's role?",
             name: "role",
-            choices:[]
+            choices: function(){
+                let roles =[]
+                dbConnect.query('Select role.title FROM role', (err,res)=>{
+                    if (err) throw err;
+                    roles.push(res)
+                    console.log("results",res)
+                    console.log("roles",roles)
+                })
+                return roles;
+            }
         },
         {
             type: "list",
             message:"What is the employee's manager?",
             name: "role",
-            choices:[]
+            choices:["check"]
         }
     ])
+    .then((response)=>{
+        console.log(response.firstName, response.lastName, response.role)
+        // var query= `INSERT ${response.name}`
+        // dbConnect.query(query, (req, res)=>{
+        //     console.log(res)
+        // })
+    })
 }
 
 //add role
