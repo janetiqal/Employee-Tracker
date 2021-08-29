@@ -39,12 +39,13 @@ function init() {
         })
 };
 //Table View of Employees: Includes id, first & last name, title, department, salary, and manager.
+//DONE
 function viewEmployeeTable() {
     //need id, first& last name, title, department, salary,manager
     //three tables: role and employee and department tables
-    var query =  "SELECT employee.id,employee.first_name AS 'First Name', employee.last_name AS 'Last Name', role.title AS Title, role.salary AS Salary, name AS Department, CONCAT(manager.first_name, ' ', manager.last_name)AS Manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON department.id = role.department_id LEFT JOIN employee manager ON manager.id = employee.manager_id ORDER BY department.name"
+    var query = "SELECT employee.id,employee.first_name AS 'First Name', employee.last_name AS 'Last Name', role.title AS Title, role.salary AS Salary, name AS Department, CONCAT(manager.first_name, ' ', manager.last_name)AS Manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON department.id = role.department_id LEFT JOIN employee manager ON manager.id = employee.manager_id ORDER BY department.name"
     dbConnect.query(query, function (err, results) {
-        if(err){
+        if (err) {
             console.log('Error with Employee Table', err)
         }
         console.table(results);
@@ -53,22 +54,24 @@ function viewEmployeeTable() {
 };
 
 //Table View of Departments: Includes job title, role id, department the role belongs to, and corresponding salary
+//DONE
 function viewEmployeeRoles() {
     var query = 'SELECT role.id ,role.title AS Title , role.salary AS Salary, department.name AS Department FROM role LEFT JOIN department ON role.department_id = department.id'
     dbConnect.query(query, function (err, results) {
-        if(err){
+        if (err) {
             console.log("Error with viewing Employee Roles", err)
         }
         console.table(results);
-      
+
     })
     //   init();
 };
 //Table View of Departments: Includes id and name of departments
+//DONE
 function viewAllDepartments() {
     var query = 'SELECT department.id ,department.name AS Department FROM department';
     dbConnect.query(query, function (err, results) {
-        if(err){
+        if (err) {
             console.log("Error with viewing Departments", err)
         }
         console.table(results);
@@ -77,62 +80,63 @@ function viewAllDepartments() {
 };
 
 //Add Employee
+//INPUT INFO INTO DB 
 function addEmployee() {
-    inquirer.prompt([
-        {
-            type: "input",
-            message:"What is the employee's first name?",
-            name: "firstName"
-        },
-        {
-            type: "input",
-            message:"What is the employee's last name?",
-            name: "lastName"
-        },
-        {
-            type: "list",
-            message:"What is the employee's role?",
-            name: "role",
-            choices: function(){
-                var map =[]
-                
-                dbConnect.query('Select role.title FROM role', (err,res)=>{
-                    if (err) throw err;
-                    // console.log(res)
-                   var roleTtile = res.map(role=> role.title)
-                   console.log(roleTtile) 
+    //put the Db query here to give the function some time to render the results from the query
+    // var query= `Select role.title FROM role; Select CONCAT(employee.first_name," ",employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS null`;
+    dbConnect.query('Select role.title FROM role', (err, res) => {
+        if (err) throw err;
+        console.log(res)
+        var roleTitle = res.map(role => role.title)
+        // var manager = res[1].map(managerName => managerName.manager)
 
-                    // roles.push(map)
-                    // console.log("roles",roles)
-                    // console.log("results",res)
-                    // console.log("roles",roles)
-
-
-                    //trying to push the roletitle array into the array defined at the function scope so i can return it
-                    return map.push(roleTtile);
+        dbConnect.query("Select CONCAT(employee.first_name, ' ' ,employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS null" , (err, res) => {
+            if (err) throw err;
+            console.log(res)
+        var manager = res.map(managerName => managerName.Manager)
+        console.log(manager)
+        inquirer.prompt([
+                {
+                    type: "input",
+                    message: "What is the employee's first name?",
+                    name: "firstName"
+                },
+                {
+                    type: "input",
+                    message: "What is the employee's last name?",
+                    name: "lastName"
+                },
+                {
+                    type: "list",
+                    message: "What is the employee's role?",
+                    name: "role",
+                    choices: roleTitle
+                },
+                {
+                    type: "list",
+                    message: "Who is the employee's manager?",
+                    name: "manager",
+                    choices: manager
+                }
+            ])
+                .then((response) => {
+                    console.log(response.firstName, response.lastName, response.role, response.manager)
+                    // var query= `INSERT ${response.name}`
+                    // dbConnect.query(query, (req, res)=>{
+                    //     console.log(res)
+                        //"User has been added to the database"
+                        // return 
+                    // })
                 })
-             //this becomes out of scope
-             return map;
-            }
-        },
-        {
-            type: "list",
-            message:"Who is the employee's manager?",
-            name: "role",
-            choices:["check"]
-        }
-    ])
-    .then((response)=>{
-        console.log(response.firstName, response.lastName, response.role)
-        // var query= `INSERT ${response.name}`
-        // dbConnect.query(query, (req, res)=>{
-        //     console.log(res)
-        // })
-    })
-}
-
+        });
+    });
+};
 //add role
 function addRole() {
+    dbConnect.query('SELECT department.name FROM department',(err, res)=>{
+        if(err) throw err;
+        // console.log(res)
+        var departments =res.map(department => department.name);
     inquirer.prompt([
         {
             type: "input",
@@ -148,10 +152,13 @@ function addRole() {
             type: "list",
             message: "What department does this role belong to?",
             name: "designatedDepartment",
-            //when the user creates a new department it needs to be added to this choices array
-            choices: ["IT Support", "Finance", "Legal","Engineering", "Sales"]
+            choices: departments
         }
     ])
+    .then((response)=>{
+        console.log(response)
+    })
+ });
 }
 
 function addDepartment() {
@@ -162,18 +169,24 @@ function addDepartment() {
             name: "newDepartment"
         }])
         .then((response) => {
+        //INSERT NEW DEPT TO DB
             // add response.newDepartment to database
         })
 
 }
-
-function updateEmployeeRole (){
+//UPDATE THE TABLE W INFO
+function updateEmployeeRole() {
+    dbConnect.query("SELECT CONCAT(employee.first_name,' ',employee.last_name) AS Name FROM employee", (err, res)=>{
+        if (err) throw err;
+       var employeeList = res.map(employees=> employees.Name)
+       console.log(employeeList)
+  
     inquirer.prompt([
         {
             type: "list",
             message: "Which employees role do you want to update?",
             name: "roleUpdate",
-            choices: []
+            choices: employeeList
         },
         {
             type: "list",
@@ -181,6 +194,9 @@ function updateEmployeeRole (){
             name: "newSalary"
         }
         //updated employees role
-    ])
+    ]).then((response)=>{
+        console.log(response.roleUpdate, response.newSalary)
+    })
+});
 }
 init();
