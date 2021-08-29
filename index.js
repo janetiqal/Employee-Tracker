@@ -48,8 +48,8 @@ function viewEmployeeTable() {
             console.log('Error with Employee Table', err)
         }
         console.table(results);
-        init();
     })
+
 };
 
 //Table View of Departments: Includes job title, role id, department the role belongs to, and corresponding salary
@@ -60,8 +60,9 @@ function viewEmployeeRoles() {
             console.log("Error with viewing Employee Roles", err)
         }
         console.table(results);
-        init();
+      
     })
+    //   init();
 };
 //Table View of Departments: Includes id and name of departments
 function viewAllDepartments() {
@@ -71,8 +72,8 @@ function viewAllDepartments() {
             console.log("Error with viewing Departments", err)
         }
         console.table(results);
-        init();
     })
+    // init();
 };
 
 //Add Employee
@@ -93,19 +94,30 @@ function addEmployee() {
             message:"What is the employee's role?",
             name: "role",
             choices: function(){
-                let roles =[]
+                var map =[]
+                
                 dbConnect.query('Select role.title FROM role', (err,res)=>{
                     if (err) throw err;
-                    roles.push(res)
-                    console.log("results",res)
-                    console.log("roles",roles)
+                    // console.log(res)
+                   var roleTtile = res.map(role=> role.title)
+                   console.log(roleTtile) 
+
+                    // roles.push(map)
+                    // console.log("roles",roles)
+                    // console.log("results",res)
+                    // console.log("roles",roles)
+
+
+                    //trying to push the roletitle array into the array defined at the function scope so i can return it
+                    return map.push(roleTtile);
                 })
-                return roles;
+             //this becomes out of scope
+             return map;
             }
         },
         {
             type: "list",
-            message:"What is the employee's manager?",
+            message:"Who is the employee's manager?",
             name: "role",
             choices:["check"]
         }
