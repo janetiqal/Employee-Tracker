@@ -35,6 +35,7 @@ function init() {
                 case "Add Department":
                     addDepartment();
                     break;
+                default: console.log("Nothing Else")
             }
         })
 };
@@ -49,7 +50,7 @@ function viewEmployeeTable() {
             console.log('Error with Employee Table', err)
         }
         console.table(results);
-        init ();
+        init();
     })
 
 };
@@ -65,7 +66,7 @@ function viewEmployeeRoles() {
         console.table(results);
         init();
     })
-  
+
 };
 //Table View of Departments: Includes id and name of departments
 //DONE
@@ -93,7 +94,7 @@ function addEmployee() {
 
         dbConnect.query("Select CONCAT(employee.first_name, ' ' ,employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS null", (err, res) => {
             if (err) throw err;
-            console.log(res)
+            console.log("manager",res)
             var manager = res.map(managerName => managerName.Manager)
             console.log(manager)
             inquirer.prompt([
@@ -122,15 +123,15 @@ function addEmployee() {
             ])
                 .then((response) => {
                     // console.log(response.firstName, response.lastName, response.role, response.manager)
-                    dbConnect.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ?, ?, (SELECT id FROM role WHERE title = ?), (SELECT id FROM (SELECT id FROM employee WHERE first_name = ? AND last_name = ?) AS mangerID))'),
-                    [response.firstName, response.lastName, response.role, response.manager], (err, res)=>{
-                        if (err) {
-                            console.log("Error adding EMPLOYEE to database")
-                        } else{
-                        console.log("Employee Added")
-                        init();
+                    dbConnect.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?), (?), (SELECT id FROM role WHERE title = (?)), (SELECT id FROM (SELECT id FROM employee WHERE first_name = (?) AND last_name = (?))) AS mangerID))'),
+                        [response.firstName, response.lastName, response.role, response.manager], (err, res) => {
+                            if (err) {
+                                console.log("Error adding EMPLOYEE to database")
+                            } else {
+                                console.log("Employee Added")
+                                init();
+                            }
                         }
-                    }
                 })
         });
     });
@@ -159,23 +160,24 @@ function addRole() {
                 choices: departments
             }
         ])
-        //QUERY IS NOT WORKING
-        // TROUBLE connecting the dept id in department table to the department_id in role table
+            //QUERY IS NOT WORKING
+            // TROUBLE connecting the dept id in department table to the department_id in role table
             .then((response) => {
                 console.log(response.newRole, response.newSalary, response.designatedDepartment)
-                dbConnect.query('INSERT INTO role (title, salary, department_id) VALUES ?,?, (SELECT id FROM department RIGHT JOIN role ON role.department_id = department.id)', [response.newRole, response.newSalary, response.designatedDepartment], (err,res)=>{
+                dbConnect.query('INSERT INTO role (title, salary, department_id) VALUES ?,?, (SELECT id FROM department RIGHT JOIN role ON role.department_id = department.id)', [response.newRole, response.newSalary, response.designatedDepartment], (err, res) => {
                     if (err) {
                         console.log("Error adding ROLE to database", err)
-                    } else{
-                    console.log("New Role Added")
-                    init();
+                    } else {
+                        console.log("New Role Added")
+                        init();
                     }
                 })
 
             })
     });
 }
-//ADDING THE DEPT TO DB NOT WORKING
+//Adds A Department to the DB
+//DONE
 function addDepartment() {
     inquirer.prompt([
         {
@@ -185,15 +187,14 @@ function addDepartment() {
         }])
         .then((response) => {
             console.log("New Dept", response.newDepartment)
-           dbConnect.query('INSERT INTO department SET ?', response.newDepartment ,(err,res)=>{
-            if (err){
-                console.log("Error with adding new Department",err)
-            } else{
-                console.log("New Department Added")
-            }
-           })
+            dbConnect.query('INSERT INTO department (name) VALUES (?)', response.newDepartment, (err, res) => {
+                if (err) {
+                    console.log("Error with adding new Department", err)
+                } else {
+                    console.log("New Department Added")
+                }
+            })
         })
-
 }
 //UPDATE THE TABLE W INFO
 function updateEmployeeRole() {
@@ -201,6 +202,12 @@ function updateEmployeeRole() {
         if (err) throw err;
         var employeeList = res.map(employees => employees.Name)
         console.log(employeeList)
+
+        dbConnect.query("SELECT role.title FROM role", (err, res) => {
+            if (err) throw err;
+            console.log(res)
+            var roles = res.map(newRole => newRole.title)
+            console.log("roles",roles)
 
         inquirer.prompt([
             {
@@ -212,12 +219,22 @@ function updateEmployeeRole() {
             {
                 type: "list",
                 message: "Which role do you want to assign to this selected employee?",
-                name: "newSalary"
+                name: "newRole",
+                choices: roles
             }
-            //updated employees role
         ]).then((response) => {
-            console.log(response.roleUpdate, response.newSalary)
+            console.log(response.roleUpdate, response.newRole)
+            var employeeNameSplit= response.roleUpdate.split(" ")
+            console.log(employeeNameSplit)
+            dbConnect.query('UPDATE employee SET role.title = (?) FROM role WHERE role.id= employee.role_id SET employee.fist_name = (?), employee.last_name = (?) FROM employee', [response.newRole, employeeNameSplit[0],employeeNameSplit[1]], (err,res)=>{
+                if (err){
+                    console.log("Error updating role.", err)
+                }else{
+                    console.log("Updated role.")
+                }
+            })
         })
     });
+});
 }
 init();
