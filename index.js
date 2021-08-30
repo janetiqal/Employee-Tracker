@@ -3,6 +3,23 @@ const consoleTable = require("console.table");
 const mysql = require("mysql2");
 require("dotenv").config();
 const dbConnect = require("./config/connection")
+const chalkAnimation = require('chalk-animation');
+const rainbow= chalkAnimation.rainbow
+const pulse= chalkAnimation.pulse
+const figlet = require('figlet');
+
+//Banner 
+figlet.text("Employee Tracker",{
+    horizontalLayout: "Standard",
+    width:80,
+    whitespaceBreak:true,
+}, (err,res)=>{
+    if (err) throw err;
+    console.log(res)
+    init();
+})
+
+
 
 function init() {
     inquirer.prompt([
@@ -10,7 +27,7 @@ function init() {
             type: "list",
             message: "What would you like to do?",
             name: "optionsStart",
-            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "Add Department","View Employees By Manager"]
+            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "Add Department","View Employees By Manager", "Exit Program"]
         }])
         .then((response) => {
             switch (response.optionsStart) {
@@ -38,7 +55,11 @@ function init() {
                 case "View Employees By Manager":
                 viewEmployeesByManager();
                 break;
-                default: console.log("Nothing Else")
+                case "Exit Program":
+                    endprogram();
+                    break;
+                default: console.log(`End of ${response.optionsStart}`)
+       
             }
         })
 };
@@ -173,7 +194,7 @@ function addRole() {
                     if (err) {
                         console.log("Error adding ROLE to database", err)
                     } else {
-                        console.log(`New Role: ${response.newRole} added to the database.`)
+                        rainbow(`New Role: ${response.newRole} added to the database.`)
                         init();
                     }
                 })
@@ -196,7 +217,7 @@ function addDepartment() {
                 if (err) {
                     console.log("Error with adding new Department", err)
                 } else {
-                    console.log("New Department Added")
+                   rainbow("New Department Added")
                     init();
                 }
             })
@@ -240,7 +261,7 @@ function updateEmployeeRole() {
                 if (err){
                     console.log("Error updating role.", err)
                 }else{
-                    console.log("The employee's role has been updated.")
+                    rainbow("The employee's role has been updated.")
                     init();
                 }
             })
@@ -255,9 +276,6 @@ function viewEmployeesByManager (){
         var manager = res.map(manager =>{
             return {name: manager.Manager, value: manager.id}
         })
-        console.log("managername", manager)
-        console.log(res)
-    
         inquirer.prompt([
             {
             type:"list",
@@ -270,8 +288,9 @@ function viewEmployeesByManager (){
         dbConnect.query('SELECT CONCAT(employee.first_name," ", employee.last_name) AS Employees FROM employee WHERE manager_id = (?)', response.managerList, (err,results)=>{
             if (err){
                 console.log(`Error viewing Employees by Manager`, err)
+                init()
             }if(results.length == 0){
-                console.log(`This Manager currently does not manage any employees.`)
+                pulse(`This Manager currently does not manage any employees.`)
                 init();
             }
             else{
@@ -282,4 +301,9 @@ function viewEmployeesByManager (){
     })
     })
 }
-init();
+//End the CLI 
+function endprogram(){
+    rainbow("Thanks!")
+    dbConnect.end();
+}
+// init();
