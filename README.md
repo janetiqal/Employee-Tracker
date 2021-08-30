@@ -28,13 +28,17 @@ SO THAT I can organize and plan my business
 ## Experience
 I was able to query the database just fine to allow users to see options like employee Managers, role titles etc. Using the map method on the arrays being returned from the data was key to targeting exaclty what I needed. Console.logging everything returned from the database was also key in understanding how I needed to extract what I needed from the data. I had a difficult time updating or inserting the data into the data base until I learned Inquirer allows users to give a variable a name but give it a different value. For example, the user is able to see a list of department names but when the user selects a department, the value returned is the department id. This made it much easier to Update or Insert new values to the database. 
 ## Demo Video
+Full video link to demo [here](https://drive.google.com/file/d/1lsDQfH1z14tTmk58cnVdslAOiplH_YND/view?usp=sharing). </br>
+![Demo](./images/Demo.gif)
 ## Screen Shots
+<img width= "500px" src="./images/employeetable.png" alt="screenshot of employee table"/> </br>
+<img width= "500px" src="./images/options.png" alt="screenshot of options list"/>
 ## Collaboraters
 N/A
 ## License
 N/A
 ## Credits
-The npm packages Inquirer, Console.table, and mysql2.
+The npm packages Inquirer, Console.table, and MYSQL2.
 ## Tests
   N/A
 ## Contributing 

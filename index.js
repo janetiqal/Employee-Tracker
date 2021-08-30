@@ -114,7 +114,7 @@ function addEmployee() {
     //put the Db query here to give the function some time to render the results from the query
     dbConnect.query('Select role.id, role.title FROM role', (err, res) => {
         if (err) throw err;
-        console.log(res)
+        // console.log(res)
         //data normalization: displays role names but returns the value of role id so easier sql statement to update data
         var roleTitle = res.map(role => {
             return { name: role.title, value: role.id }
@@ -215,7 +215,7 @@ function addDepartment() {
             name: "newDepartment"
         }])
         .then((response) => {
-            console.log("New Dept", response.newDepartment)
+            // console.log("New Dept", response.newDepartment)
             dbConnect.query('INSERT INTO department (name) VALUES (?)', response.newDepartment, (err, res) => {
                 if (err) {
                     console.log("Error with adding new Department", err)
@@ -234,17 +234,14 @@ function updateEmployeeRole() {
             //data normalization: displays employee names but returns employee ID so easier sql statement to update data
             return { name: employees.Name, value: employees.id }
         })
-        console.log(employeeList)
+        // console.log(employeeList)
 
         dbConnect.query("SELECT role.id, role.title FROM role", (err, res) => {
             if (err) throw err;
-            console.log(res)
             var roles = res.map(newRole => {
                 //data normalization: displays role titles but returns role ID so easier sql statement to update data
                 return { name: newRole.title, value: newRole.id }
             })
-            console.log("roles", roles)
-
             inquirer.prompt([
                 {
                     type: "list",
@@ -259,7 +256,6 @@ function updateEmployeeRole() {
                     choices: roles
                 }
             ]).then((response) => {
-                console.log(response.roleUpdate, response.newRole)
                 dbConnect.query('UPDATE employee SET employee.role_id=(?) WHERE employee.id= (?)', [response.newRole, response.roleUpdate], (err, res) => {
                     if (err) {
                         console.log("Error updating role.", err)
@@ -312,7 +308,6 @@ function viewEmployeesByDepartment() {
         var departments = res.map(department => {
             return { name: department.name, value: department.id }
         })
-        console.log("dept", departments)
         inquirer.prompt([
             {
                 type: "list",
