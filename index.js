@@ -10,7 +10,7 @@ function init() {
             type: "list",
             message: "What would you like to do?",
             name: "optionsStart",
-            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "Add Department"]
+            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "Add Department","View Employees By Manager"]
         }])
         .then((response) => {
             switch (response.optionsStart) {
@@ -35,6 +35,9 @@ function init() {
                 case "Add Department":
                     addDepartment();
                     break;
+                case "View Employees By Manager":
+                viewEmployeesByManager();
+                break;
                 default: console.log("Nothing Else")
             }
         })
@@ -244,5 +247,39 @@ function updateEmployeeRole() {
         })
     });
 });
+}
+//Users able to view Employees based on Manager
+function viewEmployeesByManager (){
+    dbConnect.query('SELECT id, CONCAT(employee.first_name," ", employee.last_name) AS Manager FROM employee WHERE manager_id IS NULL', (err, res)=>{
+        if (err) throw err
+        var manager = res.map(manager =>{
+            return {name: manager.Manager, value: manager.id}
+        })
+        console.log("managername", manager)
+        console.log(res)
+    
+        inquirer.prompt([
+            {
+            type:"list",
+            name:"managerList",
+            message:"Choose the Manager",
+            choices: manager
+        }
+    ])
+    .then((response)=>{
+        dbConnect.query('SELECT CONCAT(employee.first_name," ", employee.last_name) AS Employees FROM employee WHERE manager_id = (?)', response.managerList, (err,results)=>{
+            if (err){
+                console.log(`Error viewing Employees by Manager`, err)
+            }if(results.length == 0){
+                console.log(`This Manager currently does not manage any employees.`)
+                init();
+            }
+            else{
+              console.table(results)
+              init();
+            }
+        })
+    })
+    })
 }
 init();

@@ -1,10 +1,12 @@
 # Employee-Tracker
 
 ## Description
+I created a command-line application for managing a company's employee database.This program uses MYSQL, Node.js and the Inquirer package. The user is able to add and view departments, roles and employees as well as update and employee's role within the company. 
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
-- [Features](#features)
+- [Purpose](#purpse)
+- [Experience](#experience)
 - [Demo](#demo)
 - [ScreenShot](#screenshot)
 - [Collaboraters](#collaboraters)
@@ -23,6 +25,8 @@ AS A business owner
 I WANT to be able to view and manage the departments, roles, and employees in my company
 SO THAT I can organize and plan my business
 ```
+## Experience
+I was able to query the database just fine to allow users to see options like employee Managers, role titles etc. Using the map method on the arrays being returned from the data was key to targeting exaclty what I needed. Console.logging everything returned from the database was also key in understanding how I needed to extract what I needed from the data. I had a difficult time updating or inserting the data into the data base until I learned Inquirer allows users to give a variable a name but give it a different value. For example, the user is able to see a list of department names but when the user selects a department, the value returned is the department id. This made it much easier to Update or Insert new values to the database. 
 ## Demo Video
 ## Screen Shots
 ## Collaboraters
