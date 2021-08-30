@@ -49,6 +49,7 @@ function viewEmployeeTable() {
             console.log('Error with Employee Table', err)
         }
         console.table(results);
+        init ();
     })
 
 };
@@ -62,9 +63,9 @@ function viewEmployeeRoles() {
             console.log("Error with viewing Employee Roles", err)
         }
         console.table(results);
-
+        init();
     })
-    //   init();
+  
 };
 //Table View of Departments: Includes id and name of departments
 //DONE
@@ -75,8 +76,8 @@ function viewAllDepartments() {
             console.log("Error with viewing Departments", err)
         }
         console.table(results);
+        init();
     })
-    // init();
 };
 
 //Add Employee
@@ -90,12 +91,12 @@ function addEmployee() {
         var roleTitle = res.map(role => role.title)
         // var manager = res[1].map(managerName => managerName.manager)
 
-        dbConnect.query("Select CONCAT(employee.first_name, ' ' ,employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS null" , (err, res) => {
+        dbConnect.query("Select CONCAT(employee.first_name, ' ' ,employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS null", (err, res) => {
             if (err) throw err;
             console.log(res)
-        var manager = res.map(managerName => managerName.Manager)
-        console.log(manager)
-        inquirer.prompt([
+            var manager = res.map(managerName => managerName.Manager)
+            console.log(manager)
+            inquirer.prompt([
                 {
                     type: "input",
                     message: "What is the employee's first name?",
@@ -120,47 +121,61 @@ function addEmployee() {
                 }
             ])
                 .then((response) => {
-                    console.log(response.firstName, response.lastName, response.role, response.manager)
-                    // var query= `INSERT ${response.name}`
-                    // dbConnect.query(query, (req, res)=>{
-                    //     console.log(res)
-                        //"User has been added to the database"
-                        // return 
-                    // })
+                    // console.log(response.firstName, response.lastName, response.role, response.manager)
+                    dbConnect.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ?, ?, (SELECT id FROM role WHERE title = ?), (SELECT id FROM (SELECT id FROM employee WHERE first_name = ? AND last_name = ?) AS mangerID))'),
+                    [response.firstName, response.lastName, response.role, response.manager], (err, res)=>{
+                        if (err) {
+                            console.log("Error adding EMPLOYEE to database")
+                        } else{
+                        console.log("Employee Added")
+                        init();
+                        }
+                    }
                 })
         });
     });
 };
 //add role
 function addRole() {
-    dbConnect.query('SELECT department.name FROM department',(err, res)=>{
-        if(err) throw err;
+    dbConnect.query('SELECT department.name FROM department', (err, res) => {
+        if (err) throw err;
         // console.log(res)
-        var departments =res.map(department => department.name);
-    inquirer.prompt([
-        {
-            type: "input",
-            message: "What is the name of the role?",
-            name: "newRole"
-        },
-        {
-            type: "input",
-            message: "What is the salary of the role?",
-            name: "newSalary"
-        },
-        {
-            type: "list",
-            message: "What department does this role belong to?",
-            name: "designatedDepartment",
-            choices: departments
-        }
-    ])
-    .then((response)=>{
-        console.log(response)
-    })
- });
-}
+        var departments = res.map(department => department.name);
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "What is the name of the role?",
+                name: "newRole"
+            },
+            {
+                type: "input",
+                message: "What is the salary of the role?",
+                name: "newSalary"
+            },
+            {
+                type: "list",
+                message: "What department does this role belong to?",
+                name: "designatedDepartment",
+                choices: departments
+            }
+        ])
+        //QUERY IS NOT WORKING
+        // TROUBLE connecting the dept id in department table to the department_id in role table
+            .then((response) => {
+                console.log(response.newRole, response.newSalary, response.designatedDepartment)
+                dbConnect.query('INSERT INTO role (title, salary, department_id) VALUES ?,?, (SELECT id FROM department RIGHT JOIN role ON role.department_id = department.id)', [response.newRole, response.newSalary, response.designatedDepartment], (err,res)=>{
+                    if (err) {
+                        console.log("Error adding ROLE to database", err)
+                    } else{
+                    console.log("New Role Added")
+                    init();
+                    }
+                })
 
+            })
+    });
+}
+//ADDING THE DEPT TO DB NOT WORKING
 function addDepartment() {
     inquirer.prompt([
         {
@@ -169,34 +184,40 @@ function addDepartment() {
             name: "newDepartment"
         }])
         .then((response) => {
-        //INSERT NEW DEPT TO DB
-            // add response.newDepartment to database
+            console.log("New Dept", response.newDepartment)
+           dbConnect.query('INSERT INTO department SET ?', response.newDepartment ,(err,res)=>{
+            if (err){
+                console.log("Error with adding new Department",err)
+            } else{
+                console.log("New Department Added")
+            }
+           })
         })
 
 }
 //UPDATE THE TABLE W INFO
 function updateEmployeeRole() {
-    dbConnect.query("SELECT CONCAT(employee.first_name,' ',employee.last_name) AS Name FROM employee", (err, res)=>{
+    dbConnect.query("SELECT CONCAT(employee.first_name,' ',employee.last_name) AS Name FROM employee", (err, res) => {
         if (err) throw err;
-       var employeeList = res.map(employees=> employees.Name)
-       console.log(employeeList)
-  
-    inquirer.prompt([
-        {
-            type: "list",
-            message: "Which employees role do you want to update?",
-            name: "roleUpdate",
-            choices: employeeList
-        },
-        {
-            type: "list",
-            message: "Which role do you want to assign to this selected employee?",
-            name: "newSalary"
-        }
-        //updated employees role
-    ]).then((response)=>{
-        console.log(response.roleUpdate, response.newSalary)
-    })
-});
+        var employeeList = res.map(employees => employees.Name)
+        console.log(employeeList)
+
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Which employees role do you want to update?",
+                name: "roleUpdate",
+                choices: employeeList
+            },
+            {
+                type: "list",
+                message: "Which role do you want to assign to this selected employee?",
+                name: "newSalary"
+            }
+            //updated employees role
+        ]).then((response) => {
+            console.log(response.roleUpdate, response.newSalary)
+        })
+    });
 }
 init();
