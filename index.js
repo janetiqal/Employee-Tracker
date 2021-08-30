@@ -82,21 +82,23 @@ function viewAllDepartments() {
 };
 
 //Add Employee
-//INPUT INFO INTO DB 
+//INPUT INFO INTO DB DONE
 function addEmployee() {
     //put the Db query here to give the function some time to render the results from the query
-    // var query= `Select role.title FROM role; Select CONCAT(employee.first_name," ",employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS null`;
-    dbConnect.query('Select role.title FROM role', (err, res) => {
+    dbConnect.query('Select role.id, role.title FROM role', (err, res) => {
         if (err) throw err;
         console.log(res)
-        var roleTitle = res.map(role => role.title)
-        // var manager = res[1].map(managerName => managerName.manager)
-
-        dbConnect.query("Select CONCAT(employee.first_name, ' ' ,employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS null", (err, res) => {
+         //data normalization: displays role names but returns the value of role id so easier sql statement to update data
+        var roleTitle = res.map(role => {
+            return { name:role.title, value: role.id}
+        })
+        dbConnect.query("Select employee.id,CONCAT(employee.first_name, ' ' ,employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS NULL ", (err, res) => {
             if (err) throw err;
-            console.log("manager",res)
-            var manager = res.map(managerName => managerName.Manager)
-            console.log(manager)
+            var manager = res.map(managerName =>{
+                return {name: managerName.Manager, value: managerName.id}
+            })
+            //gives the user an option to not assign a manager
+            manager.push({name: "No Manager", value: null})
             inquirer.prompt([
                 {
                     type: "input",
@@ -122,16 +124,16 @@ function addEmployee() {
                 }
             ])
                 .then((response) => {
-                    // console.log(response.firstName, response.lastName, response.role, response.manager)
-                    dbConnect.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?), (?), (SELECT id FROM role WHERE title = (?)), (SELECT id FROM (SELECT id FROM employee WHERE first_name = (?) AND last_name = (?))) AS mangerID))'),
+                    dbConnect.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ? ,?)',
                         [response.firstName, response.lastName, response.role, response.manager], (err, res) => {
+                            var fullName= response.firstName.concat(" ").concat(response.lastName)
                             if (err) {
-                                console.log("Error adding EMPLOYEE to database")
+                                console.log(`Error adding ${fullName} to database`)
                             } else {
-                                console.log("Employee Added")
+                                console.log(`Employee ${fullName} Added`)
                                 init();
                             }
-                        }
+                        })
                 })
         });
     });
@@ -192,6 +194,7 @@ function addDepartment() {
                     console.log("Error with adding new Department", err)
                 } else {
                     console.log("New Department Added")
+                    init();
                 }
             })
         })
