@@ -196,17 +196,23 @@ function addDepartment() {
             })
         })
 }
-//UPDATE THE TABLE W INFO
+//Updates an Employee's role. DONE
 function updateEmployeeRole() {
-    dbConnect.query("SELECT CONCAT(employee.first_name,' ',employee.last_name) AS Name FROM employee", (err, res) => {
+    dbConnect.query("SELECT employee.id, CONCAT(employee.first_name,' ',employee.last_name) AS Name FROM employee", (err, res) => {
         if (err) throw err;
-        var employeeList = res.map(employees => employees.Name)
+        var employeeList = res.map(employees =>{
+         //data normalization: displays employee names but returns employee ID so easier sql statement to update data
+         return {name: employees.Name, value:employees.id}
+        })
         console.log(employeeList)
 
-        dbConnect.query("SELECT role.title FROM role", (err, res) => {
+        dbConnect.query("SELECT role.id, role.title FROM role", (err, res) => {
             if (err) throw err;
             console.log(res)
-            var roles = res.map(newRole => newRole.title)
+            var roles = res.map(newRole => {
+                //data normalization: displays role titles but returns role ID so easier sql statement to update data
+                return {name: newRole.title, value: newRole.id }
+            })
             console.log("roles",roles)
 
         inquirer.prompt([
@@ -224,13 +230,12 @@ function updateEmployeeRole() {
             }
         ]).then((response) => {
             console.log(response.roleUpdate, response.newRole)
-            var employeeNameSplit= response.roleUpdate.split(" ")
-            console.log(employeeNameSplit)
-            dbConnect.query('UPDATE employee SET role.title = (?) FROM role WHERE role.id= employee.role_id SET employee.fist_name = (?), employee.last_name = (?) FROM employee', [response.newRole, employeeNameSplit[0],employeeNameSplit[1]], (err,res)=>{
+            dbConnect.query('UPDATE employee SET employee.role_id=(?) WHERE employee.id= (?)', [response.newRole, response.roleUpdate], (err,res)=>{
                 if (err){
                     console.log("Error updating role.", err)
                 }else{
-                    console.log("Updated role.")
+                    console.log("The employee's role has been updated.")
+                    init();
                 }
             })
         })
