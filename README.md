@@ -5,7 +5,7 @@ I created a command-line application for managing a company's employee database.
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
-- [Purpose](#purpse)
+- [Purpose](#purpose)
 - [Experience](#experience)
 - [Demo](#demo)
 - [ScreenShot](#screenshot)
