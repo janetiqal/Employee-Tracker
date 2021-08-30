@@ -136,12 +136,14 @@ function addEmployee() {
         });
     });
 };
-//add role
+//Adds a New Role to the Role Table in the DB DONE
 function addRole() {
-    dbConnect.query('SELECT department.name FROM department', (err, res) => {
+    dbConnect.query('SELECT department.id, department.name FROM department', (err, res) => {
         if (err) throw err;
-        // console.log(res)
-        var departments = res.map(department => department.name);
+          //data normalization: displays employee names but returns employee ID so easier sql statement to update data
+        var departments = res.map(department =>{
+            return {name: department.name, value: department.id}
+        });
         inquirer.prompt([
             {
                 type: "input",
@@ -160,15 +162,13 @@ function addRole() {
                 choices: departments
             }
         ])
-            //QUERY IS NOT WORKING
-            // TROUBLE connecting the dept id in department table to the department_id in role table
             .then((response) => {
-                console.log(response.newRole, response.newSalary, response.designatedDepartment)
-                dbConnect.query('INSERT INTO role (title, salary, department_id) VALUES ?,?, (SELECT id FROM department RIGHT JOIN role ON role.department_id = department.id)', [response.newRole, response.newSalary, response.designatedDepartment], (err, res) => {
+                // console.log(response.newRole, response.newSalary, response.designatedDepartment)
+                dbConnect.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [response.newRole, response.newSalary, response.designatedDepartment], (err, res) => {
                     if (err) {
                         console.log("Error adding ROLE to database", err)
                     } else {
-                        console.log("New Role Added")
+                        console.log(`New Role: ${response.newRole} added to the database.`)
                         init();
                     }
                 })
