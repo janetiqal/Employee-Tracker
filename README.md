@@ -8,7 +8,7 @@ I created a command-line application for managing a company's employee database.
 - [Purpose](#purpose)
 - [Experience](#experience)
 - [Demo](#demo)
-- [ScreenShot](#screenshot)
+- [ScreenShot](#screenshots)
 - [Collaboraters](#collaboraters)
 - [License](#license)
 - [Credits](#credits)
@@ -30,7 +30,7 @@ I was able to query the database just fine to allow users to see options like em
 ## Demo
 Full video link to demo [here](https://drive.google.com/file/d/1lsDQfH1z14tTmk58cnVdslAOiplH_YND/view?usp=sharing). </br>
 ![Demo](./images/Demo.gif)
-## Screen Shots
+## Screenshots
 <img width= "500px" src="./images/employeetable.png" alt="screenshot of employee table"/> </br>
 <img width= "500px" src="./images/options.png" alt="screenshot of options list"/>
 ## Collaboraters
