@@ -4,16 +4,16 @@ const mysql = require("mysql2");
 require("dotenv").config();
 const dbConnect = require("./config/connection")
 const chalkAnimation = require('chalk-animation');
-const rainbow= chalkAnimation.rainbow
-const pulse= chalkAnimation.pulse
+const rainbow = chalkAnimation.rainbow
+const pulse = chalkAnimation.pulse
 const figlet = require('figlet');
 
 //Banner 
-figlet.text("Employee Tracker",{
+figlet.text("Employee Tracker", {
     horizontalLayout: "Standard",
-    width:80,
-    whitespaceBreak:true,
-}, (err,res)=>{
+    width: 80,
+    whitespaceBreak: true,
+}, (err, res) => {
     if (err) throw err;
     console.log(res)
     init();
@@ -27,7 +27,7 @@ function init() {
             type: "list",
             message: "What would you like to do?",
             name: "optionsStart",
-            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "Add Department","View Employees By Manager", "Exit Program"]
+            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "Add Department", "View Employees By Manager", "View Employees by Department", "Exit Program"]
         }])
         .then((response) => {
             switch (response.optionsStart) {
@@ -53,13 +53,16 @@ function init() {
                     addDepartment();
                     break;
                 case "View Employees By Manager":
-                viewEmployeesByManager();
-                break;
+                    viewEmployeesByManager();
+                    break;
+                case "View Employees by Department":
+                    viewEmployeesByDepartment();
+                    break;
                 case "Exit Program":
                     endprogram();
                     break;
                 default: console.log(`End of ${response.optionsStart}`)
-       
+
             }
         })
 };
@@ -112,17 +115,17 @@ function addEmployee() {
     dbConnect.query('Select role.id, role.title FROM role', (err, res) => {
         if (err) throw err;
         console.log(res)
-         //data normalization: displays role names but returns the value of role id so easier sql statement to update data
+        //data normalization: displays role names but returns the value of role id so easier sql statement to update data
         var roleTitle = res.map(role => {
-            return { name:role.title, value: role.id}
+            return { name: role.title, value: role.id }
         })
         dbConnect.query("Select employee.id,CONCAT(employee.first_name, ' ' ,employee.last_name) AS Manager FROM employee WHERE employee.manager_id IS NULL ", (err, res) => {
             if (err) throw err;
-            var manager = res.map(managerName =>{
-                return {name: managerName.Manager, value: managerName.id}
+            var manager = res.map(managerName => {
+                return { name: managerName.Manager, value: managerName.id }
             })
             //gives the user an option to not assign a manager
-            manager.push({name: "No Manager", value: null})
+            manager.push({ name: "No Manager", value: null })
             inquirer.prompt([
                 {
                     type: "input",
@@ -150,7 +153,7 @@ function addEmployee() {
                 .then((response) => {
                     dbConnect.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ? ,?)',
                         [response.firstName, response.lastName, response.role, response.manager], (err, res) => {
-                            var fullName= response.firstName.concat(" ").concat(response.lastName)
+                            var fullName = response.firstName.concat(" ").concat(response.lastName)
                             if (err) {
                                 console.log(`Error adding ${fullName} to database`)
                             } else {
@@ -166,9 +169,9 @@ function addEmployee() {
 function addRole() {
     dbConnect.query('SELECT department.id, department.name FROM department', (err, res) => {
         if (err) throw err;
-          //data normalization: displays employee names but returns employee ID so easier sql statement to update data
-        var departments = res.map(department =>{
-            return {name: department.name, value: department.id}
+        //data normalization: displays employee names but returns employee ID so easier sql statement to update data
+        var departments = res.map(department => {
+            return { name: department.name, value: department.id }
         });
         inquirer.prompt([
             {
@@ -217,7 +220,7 @@ function addDepartment() {
                 if (err) {
                     console.log("Error with adding new Department", err)
                 } else {
-                   rainbow("New Department Added")
+                    rainbow("New Department Added")
                     init();
                 }
             })
@@ -227,9 +230,9 @@ function addDepartment() {
 function updateEmployeeRole() {
     dbConnect.query("SELECT employee.id, CONCAT(employee.first_name,' ',employee.last_name) AS Name FROM employee", (err, res) => {
         if (err) throw err;
-        var employeeList = res.map(employees =>{
-         //data normalization: displays employee names but returns employee ID so easier sql statement to update data
-         return {name: employees.Name, value:employees.id}
+        var employeeList = res.map(employees => {
+            //data normalization: displays employee names but returns employee ID so easier sql statement to update data
+            return { name: employees.Name, value: employees.id }
         })
         console.log(employeeList)
 
@@ -238,71 +241,106 @@ function updateEmployeeRole() {
             console.log(res)
             var roles = res.map(newRole => {
                 //data normalization: displays role titles but returns role ID so easier sql statement to update data
-                return {name: newRole.title, value: newRole.id }
+                return { name: newRole.title, value: newRole.id }
             })
-            console.log("roles",roles)
+            console.log("roles", roles)
 
-        inquirer.prompt([
-            {
-                type: "list",
-                message: "Which employees role do you want to update?",
-                name: "roleUpdate",
-                choices: employeeList
-            },
-            {
-                type: "list",
-                message: "Which role do you want to assign to this selected employee?",
-                name: "newRole",
-                choices: roles
-            }
-        ]).then((response) => {
-            console.log(response.roleUpdate, response.newRole)
-            dbConnect.query('UPDATE employee SET employee.role_id=(?) WHERE employee.id= (?)', [response.newRole, response.roleUpdate], (err,res)=>{
-                if (err){
-                    console.log("Error updating role.", err)
-                }else{
-                    rainbow("The employee's role has been updated.")
-                    init();
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Which employees role do you want to update?",
+                    name: "roleUpdate",
+                    choices: employeeList
+                },
+                {
+                    type: "list",
+                    message: "Which role do you want to assign to this selected employee?",
+                    name: "newRole",
+                    choices: roles
                 }
+            ]).then((response) => {
+                console.log(response.roleUpdate, response.newRole)
+                dbConnect.query('UPDATE employee SET employee.role_id=(?) WHERE employee.id= (?)', [response.newRole, response.roleUpdate], (err, res) => {
+                    if (err) {
+                        console.log("Error updating role.", err)
+                    } else {
+                        rainbow("The employee's role has been updated.")
+                        init();
+                    }
+                })
             })
-        })
+        });
     });
-});
 }
 //Users able to view Employees based on Manager
-function viewEmployeesByManager (){
-    dbConnect.query('SELECT id, CONCAT(employee.first_name," ", employee.last_name) AS Manager FROM employee WHERE manager_id IS NULL', (err, res)=>{
+function viewEmployeesByManager() {
+    dbConnect.query('SELECT id, CONCAT(employee.first_name," ", employee.last_name) AS Manager FROM employee WHERE manager_id IS NULL', (err, res) => {
         if (err) throw err
-        var manager = res.map(manager =>{
-            return {name: manager.Manager, value: manager.id}
+        var manager = res.map(manager => {
+            return { name: manager.Manager, value: manager.id }
         })
         inquirer.prompt([
             {
-            type:"list",
-            name:"managerList",
-            message:"Choose the Manager",
-            choices: manager
-        }
-    ])
-    .then((response)=>{
-        dbConnect.query('SELECT CONCAT(employee.first_name," ", employee.last_name) AS Employees FROM employee WHERE manager_id = (?)', response.managerList, (err,results)=>{
-            if (err){
-                console.log(`Error viewing Employees by Manager`, err)
-                init()
-            }if(results.length == 0){
-                pulse(`This Manager currently does not manage any employees.`)
-                init();
+                type: "list",
+                name: "managerList",
+                message: "Choose the Manager to see the employees they manage.",
+                choices: manager
             }
-            else{
-              console.table(results)
-              init();
-            }
-        })
-    })
+        ])
+            .then((response) => {
+                dbConnect.query('SELECT CONCAT(employee.first_name," ", employee.last_name) AS Employees FROM employee WHERE manager_id = (?)', response.managerList, (err, results) => {
+                    if (err) {
+                        console.log(`Error viewing Employees by Manager`, err)
+                        init()
+                    } if (results.length == 0) {
+                        pulse(`This Manager currently does not manage any employees.`)
+                        init();
+                    }
+                    else {
+                        console.table(results)
+                        init();
+                    }
+                })
+            })
     })
 }
+
+//Users able to view Employees by Department
+function viewEmployeesByDepartment() {
+    dbConnect.query('SELECT id, name FROM department', (err, res) => {
+        if (err) throw err
+        var departments = res.map(department => {
+            return { name: department.name, value: department.id }
+        })
+        console.log("dept", departments)
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "departmentlist",
+                message: "Choose the Department to see the employees with in it.",
+                choices: departments
+            }
+        ])
+            .then((response) => {
+                dbConnect.query('SELECT CONCAT(employee.first_name," ", employee.last_name) AS Employees FROM employee RIGHT JOIN role ON role.id=employee.role_id RIGHT JOIN department ON role.department_id =department.id WHERE role.department_id =(?)', response.departmentlist, (err, results) => {
+                    if (err) {
+                        console.log(`Error viewing Employees by Department`, err)
+                        init()
+                    } if (results.length == 0) {
+                        pulse(`This Department currently has no employees.`)
+                        init();
+                    }
+                    else {
+                        console.table(results)
+                        init();
+                    }
+                })
+            })
+    })
+}
+
 //End the CLI 
-function endprogram(){
+function endprogram() {
     rainbow("Thanks!")
     dbConnect.end();
 }
