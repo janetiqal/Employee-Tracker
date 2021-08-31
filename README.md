@@ -18,7 +18,7 @@ I created a command-line application for managing a company's employee database.
 ## Installation
 Run npm i to install the dependent packages, then node index.js in the terminal.
 ## Usage
-Open index.js in the integrated terminal and run node index.js to start the application.
+Open index.js in the integrated terminal and run node index.js to start the application. To exit the program, toggle down the the EXIT option and hit enter.
 ## Purpose
 ```
 AS A business owner
@@ -26,7 +26,7 @@ I WANT to be able to view and manage the departments, roles, and employees in my
 SO THAT I can organize and plan my business
 ```
 ## Experience
-I was able to query the database just fine to allow users to see options like employee Managers, role titles etc. Using the map method on the arrays being returned from the data was key to targeting exaclty what I needed. Console.logging everything returned from the database was also key in understanding how I needed to extract what I needed from the data. I had a difficult time updating or inserting the data into the data base until I learned Inquirer allows users to give a variable a name but give it a different value. For example, the user is able to see a list of department names but when the user selects a department, the value returned is the department id. This made it much easier to Update or Insert new values to the database. 
+I was able to query the database just fine to allow users to see options like employee Managers, role titles etc. Using the map method on the responses from the databse was key to targeting exaclty what I needed. Logging the information to the console was also key in understanding how I needed to extract what I needed from the data. I had a difficult time updating or inserting the data into the data base until I learned Inquirer allows users to give a variable a name but give it a different value. For example, the user is able to see a list of department names but when the user selects a department, the value returned is the department id. This made it much easier to Update or Insert new values to the database. 
 ## Demo
 Full video link to demo [here](https://drive.google.com/file/d/1lsDQfH1z14tTmk58cnVdslAOiplH_YND/view?usp=sharing). </br>
 ![Demo](./images/Demo.gif)
