@@ -130,12 +130,14 @@ function addEmployee() {
                 {
                     type: "input",
                     message: "What is the employee's first name?",
-                    name: "firstName"
+                    name: "firstName",
+                    validate: string => string.length > 0 ? true : "You must include a first name."
                 },
                 {
                     type: "input",
                     message: "What is the employee's last name?",
-                    name: "lastName"
+                    name: "lastName",
+                    validate: string => string.length > 0 ? true : "You must include a last name."
                 },
                 {
                     type: "list",
@@ -180,12 +182,13 @@ function addRole() {
             {
                 type: "input",
                 message: "What is the name of the role?",
-                name: "newRole"
+                name: "newRole",
+                validate: string => string.length > 0 ? true : "You must include a new Role."
             },
             {
                 type: "input",
                 message: "What is the salary of the role?",
-                name: "newSalary"
+                name: "newSalary",
             },
             {
                 type: "list",
@@ -213,7 +216,8 @@ function addDepartment() {
         {
             type: "input",
             message: "What is the name of the new department?",
-            name: "newDepartment"
+            name: "newDepartment",
+            validate: string => string.length > 0 ? true: "You must include a department in this field"
         }])
         .then((response) => {
             dbConnect.query('INSERT INTO department (name) VALUES (?)', capitalLetter(response.newDepartment), (err, res) => {
@@ -371,7 +375,7 @@ function endprogram() {
 }
 // init();
 
-//capitalizes the first letter of every word
+//capitalizes the first letter of every word inputted 
 function capitalLetter(input){
   const words = input.split(" ")
     for (let i =0; i <words.length; i++){
