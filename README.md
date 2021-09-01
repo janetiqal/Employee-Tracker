@@ -6,6 +6,7 @@ I created a command-line application for managing a company's employee database.
 - [Installation](#installation)
 - [Usage](#usage)
 - [Purpose](#purpose)
+- [Features](#features)
 - [Experience](#experience)
 - [Demo](#demo)
 - [ScreenShot](#screenshots)
@@ -25,6 +26,8 @@ AS A business owner
 I WANT to be able to view and manage the departments, roles, and employees in my company
 SO THAT I can organize and plan my business
 ```
+## Features
+A user is able to view a list of every employee in the company, employees by manager, employees by department, view all company roles, view all company departments. Users are  update an employees role. Users are also able to add a new employee to the company, add a new department and add a new company role. 
 ## Experience
 I was able to query the database just fine to allow users to see options like employee Managers, role titles etc. Using the map method on the responses from the databse was key to targeting exaclty what I needed. Logging the information to the console was also key in understanding how I needed to extract what I needed from the data. I had a difficult time updating or inserting the data into the data base until I learned Inquirer allows users to give a variable a name but give it a different value. For example, the user is able to see a list of department names but when the user selects a department, the value returned is the department id. This made it much easier to Update or Insert new values to the database. 
 ## Demo
@@ -44,5 +47,5 @@ The npm packages Inquirer, Console.table, and MYSQL2.
 ## Contributing 
   It is an open source project, please contact me to be added as a contributor.
 ## Questions
-  If you have any questions or would like to discuss this application further, please reach out to me via email at [j.iqal35@gmail.com](mailto:j.iqal35@gmail.com) or visit my github profile at [janetiqal](http://www.github.com/janetiqal).
+  If you have any questions or would like to discuss or contribute to this application , please reach out to me via email at [j.iqal35@gmail.com](mailto:j.iqal35@gmail.com) or visit my github profile at [janetiqal](http://www.github.com/janetiqal).
 ## Created By Janet Iqal
