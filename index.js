@@ -27,7 +27,7 @@ function init() {
             type: "list",
             message: "What would you like to do?",
             name: "optionsStart",
-            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "Add Department", "View Employees By Manager", "View Employees by Department", "Exit Program"]
+            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "View Budgets by Departments","Add Department", "View Employees By Manager", "View Employees by Department", "Exit Program"]
         }])
         .then((response) => {
             switch (response.optionsStart) {
@@ -40,6 +40,9 @@ function init() {
                 case "View all Departments":
                     viewAllDepartments();
                     break;
+                case "View Budgets by Departments":
+                viewDepartmentBudgets();
+                break;
                 case "Add Employee":
                     addEmployee();
                     break;
@@ -329,6 +332,35 @@ function viewEmployeesByDepartment() {
             })
     })
 }
+//View Budgets by Department
+function viewDepartmentBudgets(){
+    dbConnect.query('SELECT id, name FROM department', (err, res)=>{
+        if (err) throw err;
+        var departments = res.map(department => {
+            return { name: department.name, value: department.id }
+        })
+    
+     inquirer.prompt([
+        {
+            type: "list",
+            name: "departmentbudget",
+            message: "Choose the Department for which you would like to see the annual budget.",
+            choices: departments
+        }
+    ]) .then((response)=>{
+        dbConnect.query('Select name as Department, SUM(role.salary) as Budget FROM department LEFT JOIN role ON department.id = role.department_id WHERE department.id =(?)', response.departmentbudget, (err,results)=>{
+            if (err) {
+                console.log(`Error viewing Employees by Department`, err)
+                init()
+        } else {
+            console.table(results)
+            init();
+        }
+        })
+    })  
+})
+}
+
 
 //End the CLI 
 function endprogram() {
