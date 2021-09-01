@@ -189,6 +189,7 @@ function addRole() {
                 type: "input",
                 message: "What is the salary of the role?",
                 name: "newSalary",
+                validate: string => Number.isNaN(parseInt(string)) ? true: 'Please enter a valid number.'
             },
             {
                 type: "list",
@@ -206,7 +207,7 @@ function addRole() {
                         init();
                     }
                 })
-
+            
             })
     });
 }
