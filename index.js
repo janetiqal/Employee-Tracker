@@ -67,7 +67,7 @@ function init() {
         })
 };
 //Table View of Employees: Includes id, first & last name, title, department, salary, and manager.
-//DONE
+
 function viewEmployeeTable() {
     //need id, first& last name, title, department, salary,manager
     //three tables: role and employee and department tables
@@ -83,7 +83,6 @@ function viewEmployeeTable() {
 };
 
 //Table View of Departments: Includes job title, role id, department the role belongs to, and corresponding salary
-//DONE
 function viewEmployeeRoles() {
     var query = 'SELECT role.id ,role.title AS Title , role.salary AS Salary, department.name AS Department FROM role LEFT JOIN department ON role.department_id = department.id'
     dbConnect.query(query, function (err, results) {
@@ -96,7 +95,6 @@ function viewEmployeeRoles() {
 
 };
 //Table View of Departments: Includes id and name of departments
-//DONE
 function viewAllDepartments() {
     var query = 'SELECT department.id ,department.name AS Department FROM department';
     dbConnect.query(query, function (err, results) {
@@ -109,7 +107,6 @@ function viewAllDepartments() {
 };
 
 //Add Employee
-//INPUT INFO INTO DB DONE
 function addEmployee() {
     //put the Db query here to give the function some time to render the results from the query
     dbConnect.query('Select role.id, role.title FROM role', (err, res) => {
@@ -165,7 +162,7 @@ function addEmployee() {
         });
     });
 };
-//Adds a New Role to the Role Table in the DB DONE
+//Adds a New Role to the Role Table in the DB 
 function addRole() {
     dbConnect.query('SELECT department.id, department.name FROM department', (err, res) => {
         if (err) throw err;
@@ -206,7 +203,6 @@ function addRole() {
     });
 }
 //Adds A Department to the DB
-//DONE
 function addDepartment() {
     inquirer.prompt([
         {
@@ -226,7 +222,7 @@ function addDepartment() {
             })
         })
 }
-//Updates an Employee's role. DONE
+//Updates an Employee's role. 
 function updateEmployeeRole() {
     dbConnect.query("SELECT employee.id, CONCAT(employee.first_name,' ',employee.last_name) AS Name FROM employee", (err, res) => {
         if (err) throw err;
