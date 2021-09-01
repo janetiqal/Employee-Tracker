@@ -151,9 +151,12 @@ function addEmployee() {
                 }
             ])
                 .then((response) => {
+                //capitalizing first and last names from user response
+                var firstNameCap = capitalLetter(response.firstName)
+                var lastNameCap = capitalLetter(response.lastName)
                     dbConnect.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ? ,?)',
-                        [response.firstName, response.lastName, response.role, response.manager], (err, res) => {
-                            var fullName = response.firstName.concat(" ").concat(response.lastName)
+                        [firstNameCap, lastNameCap, response.role, response.manager], (err, res) => {
+                            var fullName = firstNameCap.concat(" ").concat(lastNameCap)
                             if (err) {
                                 console.log(`Error adding ${fullName} to database`)
                             } else {
@@ -192,8 +195,7 @@ function addRole() {
             }
         ])
             .then((response) => {
-                // console.log(response.newRole, response.newSalary, response.designatedDepartment)
-                dbConnect.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [response.newRole, response.newSalary, response.designatedDepartment], (err, res) => {
+                dbConnect.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [capitalLetter(response.newRole), response.newSalary, response.designatedDepartment], (err, res) => {
                     if (err) {
                         console.log("Error adding ROLE to database", err)
                     } else {
@@ -214,10 +216,10 @@ function addDepartment() {
             name: "newDepartment"
         }])
         .then((response) => {
-            // console.log("New Dept", response.newDepartment)
-            dbConnect.query('INSERT INTO department (name) VALUES (?)', response.newDepartment, (err, res) => {
+            dbConnect.query('INSERT INTO department (name) VALUES (?)', capitalLetter(response.newDepartment), (err, res) => {
                 if (err) {
                     console.log("Error with adding new Department", err)
+                    init();
                 } else {
                     rainbow("New Department Added")
                     init();
@@ -368,3 +370,12 @@ function endprogram() {
     dbConnect.end();
 }
 // init();
+
+//capitalizes the first letter of every word
+function capitalLetter(input){
+  const words = input.split(" ")
+    for (let i =0; i <words.length; i++){
+    words[i]=words[i].charAt(0).toUpperCase()+ words[i].substr(1)
+    }
+    return words.join(" ")
+}
