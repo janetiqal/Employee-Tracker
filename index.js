@@ -7,6 +7,7 @@ const chalkAnimation = require('chalk-animation');
 const rainbow = chalkAnimation.rainbow
 const pulse = chalkAnimation.pulse
 const figlet = require('figlet');
+const { parse } = require("dotenv");
 
 //Banner 
 figlet.text("Employee Tracker", {
@@ -27,7 +28,7 @@ function init() {
             type: "list",
             message: "What would you like to do?",
             name: "optionsStart",
-            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "View Budgets by Departments","Add Department", "View Employees By Manager", "View Employees by Department", "Exit Program"]
+            choices: ["View all Employees", "Add Employee", "Update Employees Role", "View All Roles", "Add Role", "View all Departments", "View Budgets by Departments", "Add Department", "View Employees By Manager", "View Employees by Department", "Exit Program"]
         }])
         .then((response) => {
             switch (response.optionsStart) {
@@ -41,8 +42,8 @@ function init() {
                     viewAllDepartments();
                     break;
                 case "View Budgets by Departments":
-                viewDepartmentBudgets();
-                break;
+                    viewDepartmentBudgets();
+                    break;
                 case "Add Employee":
                     addEmployee();
                     break;
@@ -153,9 +154,9 @@ function addEmployee() {
                 }
             ])
                 .then((response) => {
-                //capitalizing first and last names from user response
-                var firstNameCap = capitalLetter(response.firstName)
-                var lastNameCap = capitalLetter(response.lastName)
+                    //capitalizing first and last names from user response
+                    var firstNameCap = capitalLetter(response.firstName)
+                    var lastNameCap = capitalLetter(response.lastName)
                     dbConnect.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ? ,?)',
                         [firstNameCap, lastNameCap, response.role, response.manager], (err, res) => {
                             var fullName = firstNameCap.concat(" ").concat(lastNameCap)
@@ -187,9 +188,12 @@ function addRole() {
             },
             {
                 type: "input",
-                message: "What is the salary of the role?",
+                message: "What is the salary of the role, only include numbers and decimals?",
                 name: "newSalary",
-                // validate: string => typeof parseInt(string) === 'number' ? true:  'Please enter a valid number.'
+                validate: async (inputNumber) => {
+                    return /^[\d\.]+$/.test(inputNumber);
+                }
+                // validate: input => typeof parseInt(input) === 'number' ? true:  'Please enter a valid number.'
                 // validate: string => Number.isNaN(parseInt(string)) ? true: 'Please enter a valid number.'
             },
             {
@@ -201,14 +205,14 @@ function addRole() {
         ])
             .then((response) => {
                 dbConnect.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [capitalLetter(response.newRole), response.newSalary, response.designatedDepartment], (err, res) => {
-                    if (err) {
-                        console.log("Error adding ROLE to database", err)
-                    } else {
-                        rainbow(`New Role: ${response.newRole} added to the database.`)
-                        init();
-                    }
-                })
-            
+                        if (err) {
+                            console.log("Error adding ROLE to database", err)
+                        } else {
+                            rainbow(`New Role: ${response.newRole} added to the database.`)
+                            init();
+                        }
+                    })
+
             })
     });
 }
@@ -219,7 +223,7 @@ function addDepartment() {
             type: "input",
             message: "What is the name of the new department?",
             name: "newDepartment",
-            validate: string => string.length > 0 ? true: "You must include a department in this field"
+            validate: string => string.length > 0 ? true : "You must include a department in this field"
         }])
         .then((response) => {
             dbConnect.query('INSERT INTO department (name) VALUES (?)', capitalLetter(response.newDepartment), (err, res) => {
@@ -341,32 +345,32 @@ function viewEmployeesByDepartment() {
     })
 }
 //View Budgets by Department
-function viewDepartmentBudgets(){
-    dbConnect.query('SELECT id, name FROM department', (err, res)=>{
+function viewDepartmentBudgets() {
+    dbConnect.query('SELECT id, name FROM department', (err, res) => {
         if (err) throw err;
         var departments = res.map(department => {
             return { name: department.name, value: department.id }
         })
-    
-     inquirer.prompt([
-        {
-            type: "list",
-            name: "departmentbudget",
-            message: "Choose the Department for which you would like to see the annual budget.",
-            choices: departments
-        }
-    ]) .then((response)=>{
-        dbConnect.query('Select name as Department, SUM(role.salary) as Budget FROM department LEFT JOIN role ON department.id = role.department_id WHERE department.id =(?)', response.departmentbudget, (err,results)=>{
-            if (err) {
-                console.log(`Error viewing Employees by Department`, err)
-                init()
-        } else {
-            console.table(results)
-            init();
-        }
+
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "departmentbudget",
+                message: "Choose the Department for which you would like to see the annual budget.",
+                choices: departments
+            }
+        ]).then((response) => {
+            dbConnect.query('Select name as Department, SUM(role.salary) as Budget FROM department LEFT JOIN role ON department.id = role.department_id WHERE department.id =(?)', response.departmentbudget, (err, results) => {
+                if (err) {
+                    console.log(`Error viewing Employees by Department`, err)
+                    init()
+                } else {
+                    console.table(results)
+                    init();
+                }
+            })
         })
-    })  
-})
+    })
 }
 
 
@@ -378,10 +382,10 @@ function endprogram() {
 // init();
 
 //capitalizes the first letter of every word inputted 
-function capitalLetter(input){
-  const words = input.split(" ")
-    for (let i =0; i <words.length; i++){
-    words[i]=words[i].charAt(0).toUpperCase()+ words[i].substr(1)
+function capitalLetter(input) {
+    const words = input.split(" ")
+    for (let i = 0; i < words.length; i++) {
+        words[i] = words[i].charAt(0).toUpperCase() + words[i].substr(1)
     }
     return words.join(" ")
 }
