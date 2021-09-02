@@ -188,13 +188,22 @@ function addRole() {
             },
             {
                 type: "input",
-                message: "What is the salary of the role, only include numbers and decimals?",
+                message: "What is the salary of this new role",
                 name: "newSalary",
-                validate: async (inputNumber) => {
-                    return /^[\d\.]+$/.test(inputNumber);
+                //needs a promise per inquirer docs & this resource https://github.com/SBoudrias/Inquirer.js/issues/538
+                validate: async (string) => {
+                    return new Promise((resolve, reject) => {
+                        if (Number.isNaN(parseInt(string))) {
+                          reject('Please enter a valid number in this field.');
+                        }
+                        resolve(true);
+                      })
                 }
+                // validate: async (inputNumber) => {
+                //     return /^[\d\.]+$/.test(inputNumber); this worked
+                // }
+                //this didnt work
                 // validate: input => typeof parseInt(input) === 'number' ? true:  'Please enter a valid number.'
-                // validate: string => Number.isNaN(parseInt(string)) ? true: 'Please enter a valid number.'
             },
             {
                 type: "list",
